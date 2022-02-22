@@ -1,0 +1,140 @@
+Buenas tardes,
+
+Respondiendo a la pregunta de un compañero, en diseño iterativo es posible encadenar varios bucles, para, de esta forma, resolver un problema "por etapas". Efectivamente, en el esquema general de un algoritmo iterativo:
+
+<INICIO>
+
+while(<CONT>) {
+
+   <CUERPO>
+
+}
+
+<FIN>
+
+el código <FIN> puede, a su vez, enfocarse como un nuevo algoritmo iterativo:
+
+<INICIO>
+
+while(<CONT>) {
+
+   <CUERPO>
+
+}
+
+<INICIO_2>
+
+while(<CONT_2>) {
+
+  <CUERPO_2>
+
+}
+
+<FIN_2>
+y así sucesivamente, todas las veces que se precise. De esta forma, el primer bucle permitirá conseguir un hito intermedio, que servirá como precondición al segundo bucle ... y así sucesivamente hasta lograr resolver el problema original.
+
+Esto es útil, por ejemplo, para abordar problemas sobre vectores en los que, para obtener una solución eficiente, es necesario realizar más de una pasada. Sirva como ejemplo el siguiente: calcular la varianza de una secuencia de números reales, almacenados en un vector float a[n]. La varianza es la media de los cuadrados de las diferencias entre cada valor en el vector y la media de los valores en dicho vector.  Por tanto, para resolver eficientemente este problema necesitamos:
+
+(1) Calcular primeramente la media 
+
+(2) Calcular seguidamente la varianza.
+
+El calculo de la media se realiza mediante un primer bucle, y el de la varianza mediante un segundo bucle. Veamos esto con más detalle. La especificación del algoritmo es:
+
+P: 0<=n<tam(a)
+
+float varianza(float a[n]) return (float resul)
+
+Q: resul = varianza(a,n)
+
+donde:
+
+varianza(a,n) = varianza_aux(a,n,n) 
+varianza_aux(a,n,u) = SUMA i: 0<=i<u: ((a[i] - media(a,n))^2)/n
+media(a,n) = media_aux(a,n,n)
+media_aux(a,n,u) = SUMA i: 0<=i<u: a[i]/n 
+Planteamos primeramente el cálculo de la media. Esto nos lleva a un algoritmo del tipo:
+
+// P: 0<=n<tam(a)
+
+float m =0;
+
+int i=0;
+
+while (i < n) { // INV: m = 0<=i<=n && media_aux(a,n,i)
+
+                      // Cota: n-i
+
+  m += a[i]/n;
+
+  i++;
+
+}
+
+// Q: m = media(a,n)
+
+Seguidamente, calculamos la varianza, sabiendo que hemos ya conseguido que m=media(a,n):
+
+//P:  0<=n<tam(a) && m = media(a,n)
+
+float resul=0;
+
+i = 0;
+
+while(i<n) {  // INV: resul = 0<=i<=n && varianza_aux(a,n,i)
+
+                    // Cota: n-i
+
+   float d= a[i]-m; 
+
+    resul += d*d;
+
+    i++;
+
+}
+
+// Q: resul = varianza(a,n)
+
+
+Por tanto, si encadenamos ambos algoritmos obtenemos el algoritmo que calcula la varianza:
+
+// P: 0<=n<tam(a)
+
+float m =0;
+
+int i=0;
+
+while (i < n) { // INV: m = 0<=i<=n && media_aux(a,n,i)
+
+                      // Cota: n-i
+
+  m += a[i]/n;
+
+  i++;
+
+}
+
+float resul=0;
+
+i = 0;
+
+while(i<n) {  // INV: resul = 0<=i<=n && varianza_aux(a,n,i)
+
+                    // Cota: n-i
+
+   float d= a[i]-m; 
+
+    resul += d*d;
+
+    i++;
+
+}
+
+// Q: resul = varianza(a,n)
+
+Las expresiones de cota de ambos bucles permiten probar su terminación, y, por tanto, la terminación del algoritmo. Los invariantes permiten probar su corrección (al permitir probar que, tras el primer bucle, en 'm' está la media -hito intermedio, por lo que, tras el segundo bucle, en resul estará la varianza -postcondición final).
+
+Ambos bucles tiene complejidad Theta(n), por lo que la complejidad final del algoritmo será también Theta(n) (lineal).
+
+Un saludo,
+JL 
